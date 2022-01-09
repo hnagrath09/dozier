@@ -2,11 +2,11 @@ export default function sumNumbers(
   /** @dozierParam First Number */
   /** @maxValue 20 */
   /** @minValue 5 */
-  x: number,
+  firstNumber: number,
   /** @dozierParam Second Number */
   /** @maxValue 20 */
   /** @minValue 5 */
-  y: number,
+  secondNumber: number,
 ): number {
-  return x + y
+  return firstNumber + secondNumber
 }
