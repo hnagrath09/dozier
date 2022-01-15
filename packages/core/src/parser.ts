@@ -4,8 +4,9 @@ import {
   isFunctionDeclaration,
   isVariableStatement,
   ScriptTarget,
+  SyntaxKind,
 } from 'typescript'
-import type { ArrowFunction, FunctionDeclaration, FunctionExpression, Identifier } from 'typescript'
+import type { ArrowFunction, ExportAssignment, FunctionDeclaration, FunctionExpression, Identifier } from 'typescript'
 import { lowerCase, upperFirst, words } from 'lodash'
 import { getParamsMetaDataFromJsDoc, getFunctionParam } from './param'
 import type { FunctionParams } from './param'
@@ -32,13 +33,11 @@ export default function parse(fileContent: string) {
   const sourceFile = createSourceFile('./function.ts', fileContent, ScriptTarget.ESNext)
   const { statements } = sourceFile
 
-  let functionName: string | undefined
   let functionDeclaration: FunctionDeclaration | ArrowFunction | FunctionExpression
 
   const exportDefaultStatement = statements.find(isExportAssignment)
-
   if (exportDefaultStatement) {
-    functionName = (exportDefaultStatement.expression as Identifier).escapedText as string
+    const functionName = (exportDefaultStatement.expression as Identifier).escapedText as string | undefined
     /**
      * Handles the case
      *
@@ -63,23 +62,35 @@ export default function parse(fileContent: string) {
         }
       }
     }
-  } else {
-    /**
-     * Handles the case
-     *
-     * export default function foo() {}
-     */
-    functionDeclaration = statements.find((statement) => {
-      return isFunctionDeclaration(statement) && isExportDefaultModifier(statement)
-    }) as FunctionDeclaration | undefined
-    if (functionDeclaration) {
-      functionName = functionDeclaration.name?.escapedText as string
-    }
+  }
+  /**
+   * Handles the case
+   *
+   * export default function foo() {}
+   */
+  if (!functionDeclaration) {
+    functionDeclaration = statements.find(
+      (statement) => isFunctionDeclaration(statement) && isExportDefaultModifier(statement),
+    ) as FunctionDeclaration | undefined
+  }
 
-    if (!functionDeclaration) {
-      throw new Error('Could not find export default function')
+  /**
+   * Handles the case
+   *
+   * export default () => {}
+   */
+  if (!functionDeclaration) {
+    const exportDefaultStatement = statements.find(
+      (statement) => isExportAssignment(statement) && statement.expression.kind === SyntaxKind.ArrowFunction,
+    )
+    if (exportDefaultStatement) {
+      functionDeclaration = (exportDefaultStatement as ExportAssignment).expression as ArrowFunction
     }
   }
 
-  return { functionName, ...parseFunctionParams(functionDeclaration) }
+  if (!functionDeclaration) {
+    throw new Error('Could not find export default function')
+  }
+
+  return parseFunctionParams(functionDeclaration)
 }

@@ -1,4 +1,4 @@
-import parse from './parser'
+import parse from '../parser'
 
 describe('parser', () => {
   /**
@@ -16,7 +16,6 @@ describe('parser', () => {
     }`
     const result = parse(input)
     expect(result).toEqual({
-      functionName: 'sumNumbers',
       params: [
         {
           identifier: 'firstNumber',
@@ -61,7 +60,6 @@ describe('parser', () => {
     `
     const result = parse(input)
     expect(result).toEqual({
-      functionName: 'sumNumbers',
       params: [
         {
           identifier: 'firstNumber',
@@ -99,7 +97,6 @@ describe('parser', () => {
     `
     const result = parse(input)
     expect(result).toEqual({
-      functionName: 'deleteUser',
       params: [
         {
           identifier: 'userEmail',
@@ -123,7 +120,6 @@ describe('parser', () => {
     `
     const result = parse(input)
     expect(result).toEqual({
-      functionName: 'deleteUser',
       params: [
         {
           identifier: 'userEmail',
@@ -131,6 +127,45 @@ describe('parser', () => {
           required: true,
           type: 'string',
           meta: {},
+        },
+      ],
+    })
+  })
+  /**
+   * export default () => {}
+   */
+  test('parses anonymous arrow functions correctly', () => {
+    const input = `
+    export default (
+      /** @dozierParam First Number */ /** @maxValue 20 */ /** @minValue 5 */
+      a: number,
+      /** @dozierParam Second Number */ /** @maxValue 20 */ /** @minValue 5 */ /** @step 1 */
+      b: number,
+    ) => a + b
+    `
+    const result = parse(input)
+    expect(result).toEqual({
+      params: [
+        {
+          identifier: 'a',
+          label: 'First Number',
+          required: true,
+          type: 'number',
+          meta: {
+            minValue: 5,
+            maxValue: 20,
+          },
+        },
+        {
+          identifier: 'b',
+          label: 'Second Number',
+          required: true,
+          type: 'number',
+          meta: {
+            minValue: 5,
+            maxValue: 20,
+            step: 1,
+          },
         },
       ],
     })

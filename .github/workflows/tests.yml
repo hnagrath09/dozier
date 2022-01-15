@@ -1,4 +1,4 @@
-name: Run Tests on PR and push
+name: tests
 
 on:
   push:
