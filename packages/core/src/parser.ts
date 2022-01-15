@@ -1,24 +1,19 @@
-import { createSourceFile, FunctionDeclaration, isFunctionDeclaration, ScriptTarget } from 'typescript'
-import type { Identifier, NodeArray, Statement } from 'typescript'
+import {
+  createSourceFile,
+  isExportAssignment,
+  isFunctionDeclaration,
+  isVariableStatement,
+  ScriptTarget,
+} from 'typescript'
+import type { ArrowFunction, FunctionDeclaration, FunctionExpression, Identifier } from 'typescript'
 import { lowerCase, upperFirst, words } from 'lodash'
 import { getParamsMetaDataFromJsDoc, getFunctionParam } from './param'
 import type { FunctionParams } from './param'
 import { isExportDefaultModifier } from './statement'
 
-function parseDefaultFunction(statements: NodeArray<Statement>): {
-  functionName: string
+function parseFunctionParams(functionDeclaration: ArrowFunction | FunctionDeclaration | FunctionExpression): {
   params: FunctionParams[]
 } {
-  // Find export default function
-  const functionDeclaration = statements.find((statement) => {
-    return isFunctionDeclaration(statement) && isExportDefaultModifier(statement)
-  }) as FunctionDeclaration | undefined
-
-  if (!functionDeclaration) {
-    throw new Error('Could not find export default function')
-  }
-
-  const functionName = functionDeclaration.name?.escapedText as string
   const functionParams: FunctionParams[] = []
   functionDeclaration.parameters.forEach((param) => {
     const identifier = (param.name as Identifier).escapedText as string
@@ -30,18 +25,61 @@ function parseDefaultFunction(statements: NodeArray<Statement>): {
     functionParams.push({ identifier, label, required: !param.questionToken, ...paramData })
   })
 
-  return { functionName, params: functionParams }
+  return { params: functionParams }
 }
 
-/**
- * Parses a typescript file and returns the function arguments
- * step1: Read the file content using the provided path
- * step2: Create a source file from the content using `ts.createSourceFile`
- * step3: Extract all the useful info about export default function using `parseDefaultFunction`
- *
- * @param pathname - path to the file to parse
- */
 export default function parse(fileContent: string) {
   const sourceFile = createSourceFile('./function.ts', fileContent, ScriptTarget.ESNext)
-  return parseDefaultFunction(sourceFile.statements)
+  const { statements } = sourceFile
+
+  let functionName: string | undefined
+  let functionDeclaration: FunctionDeclaration | ArrowFunction | FunctionExpression
+
+  const exportDefaultStatement = statements.find(isExportAssignment)
+
+  if (exportDefaultStatement) {
+    functionName = (exportDefaultStatement.expression as Identifier).escapedText as string
+    /**
+     * Handles the case
+     *
+     * function foo() {}
+     *
+     * export default foo
+     */
+    functionDeclaration = statements.find(
+      (statement) => isFunctionDeclaration(statement) && statement.name?.escapedText === functionName,
+    ) as FunctionDeclaration | undefined
+
+    if (!functionDeclaration) {
+      const variableStatements = statements.filter(isVariableStatement)
+      for (const variableStatement of variableStatements) {
+        const { declarations } = variableStatement.declarationList
+
+        for (const declaration of declarations) {
+          if ((declaration.name as Identifier)?.escapedText === functionName) {
+            functionDeclaration = declaration.initializer as ArrowFunction | FunctionExpression
+            break
+          }
+        }
+      }
+    }
+  } else {
+    /**
+     * Handles the case
+     *
+     * export default function foo() {}
+     */
+    functionDeclaration = statements.find((statement) => {
+      return isFunctionDeclaration(statement) && isExportDefaultModifier(statement)
+    }) as FunctionDeclaration | undefined
+    if (functionDeclaration) {
+      functionName = functionDeclaration.name?.escapedText as string
+    }
+
+    if (!functionDeclaration) {
+      throw new Error('Could not find export default function')
+    }
+  }
+
+  return { functionName, ...parseFunctionParams(functionDeclaration) }
 }
