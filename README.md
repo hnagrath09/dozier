@@ -1,5 +1,7 @@
 # dozier
 
+![tests](https://github.com/hnagrath09/dozier/actions/workflows/tests.yml/badge.svg)
+
 ## Getting Started
 
 ### Project Structure
