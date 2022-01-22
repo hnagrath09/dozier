@@ -18,38 +18,17 @@
 
 import * as path from 'path'
 import * as fs from 'fs/promises'
-import { upperFirst, words } from 'lodash'
+import type { Route } from './route'
+import { resolveRoute, getRouteTitle } from './route'
+import { compileProgram } from './program'
 
-type DozierFunction = {
-  type: 'function'
-  path: string
-  title: string
-}
-
-type DozierModule = {
-  type: 'module'
-  path: string
-  title: string
-  children: DozierNode[]
-}
-
-type DozierNode = DozierFunction | DozierModule
-
-async function isDir(dir: string): Promise<boolean> {
-  const stat = await fs.lstat(dir)
+async function isDir(path: string): Promise<boolean> {
+  const stat = await fs.lstat(path)
   return stat.isDirectory()
 }
 
-function getPath(itemName: string, dirName?: string): string {
-  return dirName ? `${dirName}___${itemName}` : itemName
-}
-
-function getTitle(name: string): string {
-  return upperFirst(words(name).join(' '))
-}
-
-async function getPaths(rootDirPath: string, rootDirName?: string): Promise<DozierNode[]> {
-  const paths: DozierNode[] = []
+async function compileRoutes(rootDirPath: string, rootDirName?: string): Promise<Route[]> {
+  const routes: Route[] = []
 
   const dirContent = await fs.readdir(rootDirPath)
 
@@ -78,29 +57,33 @@ async function getPaths(rootDirPath: string, rootDirName?: string): Promise<Dozi
   // compile files
   for (const file of files) {
     const fileName = file.replace('.ts', '')
-    paths.push({
+    routes.push({
       type: 'function',
-      title: getTitle(fileName),
-      path: getPath(fileName, rootDirName),
+      title: getRouteTitle(fileName),
+      route: resolveRoute(fileName, rootDirName),
     })
   }
 
   for (const folder of folders) {
-    const folderName = rootDirName ? `${rootDirName}___${folder}` : folder
-    const folderChildrenPaths = await getPaths(path.resolve(rootDirPath, folder), folderName)
+    const folderName = typeof rootDirName !== 'undefined' ? `${rootDirName}/${folder}` : folder
+    const folderPath = path.resolve(rootDirPath, folder)
+    const folderChildrenPaths = await compileRoutes(folderPath, folderName)
     if (folderChildrenPaths.length > 0) {
-      paths.push({
+      routes.push({
         type: 'module',
-        title: getTitle(folder),
-        path: getPath(folder, rootDirName),
+        title: getRouteTitle(folder),
+        route: resolveRoute(folder, rootDirName),
         children: folderChildrenPaths,
       })
     }
   }
 
-  return paths
+  return routes
 }
 
-export default async function compiler(rootDirPath: string) {
-  return getPaths(rootDirPath)
+export async function compile(rootDir: string, outputDir: string): Promise<{ routes: Route[] }> {
+  const routes = await compileRoutes(rootDir)
+  await compileProgram(rootDir, outputDir, routes)
+
+  return { routes }
 }
