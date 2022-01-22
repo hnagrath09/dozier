@@ -1,9 +1,9 @@
 /**
  * Compiler recursively reads all the files and folders in the given directory
- * and returns a list of paths that can be used to generate the dozier documentation.
+ * and returns a list of paths that can be used to generate the dozier client.
  *
- * @params: rootDirPath - The path to the directory that contains all the files and folders
- * @returns: A list of paths that can be used to generate the dozier documentation
+ * @param: rootDirPath - The path to the directory that contains all the files and folders
+ * @returns: A list of paths that can be used to generate the dozier client
  *
  * @example:
  * compile('./__fixtures__/functions') will return something like:
@@ -16,8 +16,8 @@
  * ]
  */
 
-import { resolve } from 'path'
-import { readdir, readFile, lstat } from 'fs/promises'
+import * as path from 'path'
+import * as fs from 'fs/promises'
 import { upperFirst, words } from 'lodash'
 
 type DozierFunction = {
@@ -36,7 +36,7 @@ type DozierModule = {
 type DozierNode = DozierFunction | DozierModule
 
 async function isDir(dir: string): Promise<boolean> {
-  const stat = await lstat(dir)
+  const stat = await fs.lstat(dir)
   return stat.isDirectory()
 }
 
@@ -51,7 +51,7 @@ function getTitle(name: string): string {
 async function getPaths(rootDirPath: string, rootDirName?: string): Promise<DozierNode[]> {
   const paths: DozierNode[] = []
 
-  const dirContent = await readdir(rootDirPath)
+  const dirContent = await fs.readdir(rootDirPath)
 
   const files: string[] = []
   const folders: string[] = []
@@ -59,12 +59,12 @@ async function getPaths(rootDirPath: string, rootDirName?: string): Promise<Dozi
   // segregate files and folders
   for (const item of dirContent) {
     if (item.endsWith('.ts')) {
-      const fileContent = await readFile(resolve(rootDirPath, item), 'utf8')
+      const fileContent = await fs.readFile(path.resolve(rootDirPath, item), 'utf8')
       if (!fileContent.trim().startsWith('/** @dozier-ignore */')) {
         files.push(item)
       }
     } else {
-      const isItemDir = await isDir(resolve(rootDirPath, item))
+      const isItemDir = await isDir(path.resolve(rootDirPath, item))
       if (isItemDir) {
         folders.push(item)
       }
@@ -87,7 +87,7 @@ async function getPaths(rootDirPath: string, rootDirName?: string): Promise<Dozi
 
   for (const folder of folders) {
     const folderName = rootDirName ? `${rootDirName}___${folder}` : folder
-    const folderChildrenPaths = await getPaths(resolve(rootDirPath, folder), folderName)
+    const folderChildrenPaths = await getPaths(path.resolve(rootDirPath, folder), folderName)
     if (folderChildrenPaths.length > 0) {
       paths.push({
         type: 'module',

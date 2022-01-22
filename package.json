@@ -10,6 +10,7 @@
     "packages/**"
   ],
   "scripts": {
+    "start:pg": "yarn workspace @dozier/pg dev",
     "execute": "ts-node packages/core/src/parser.ts",
     "test": "jest --watch --verbose",
     "test:ci": "jest --verbose"

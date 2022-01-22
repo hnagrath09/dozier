@@ -1,0 +1,28 @@
+{
+  "name": "@dozier/pg",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "ace-builds": "^1.4.13",
+    "debounce": "^1.2.1",
+    "react": "^17.0.2",
+    "react-ace": "^9.5.0",
+    "react-dom": "^17.0.2",
+    "react-use-measure": "^2.1.1"
+  },
+  "devDependencies": {
+    "@types/debounce": "^1.2.1",
+    "@types/react": "^17.0.33",
+    "@types/react-dom": "^17.0.10",
+    "@vitejs/plugin-react": "^1.0.7",
+    "autoprefixer": "^10.4.2",
+    "postcss": "^8.4.5",
+    "tailwindcss": "^3.0.15",
+    "typescript": "^4.4.4",
+    "vite": "^2.7.2"
+  }
+}

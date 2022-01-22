@@ -33,7 +33,7 @@ export default function parse(fileContent: string) {
   const sourceFile = createSourceFile('./function.ts', fileContent, ScriptTarget.ESNext)
   const { statements } = sourceFile
 
-  let functionDeclaration: FunctionDeclaration | ArrowFunction | FunctionExpression
+  let functionDeclaration: FunctionDeclaration | ArrowFunction | FunctionExpression | undefined
 
   const exportDefaultStatement = statements.find(isExportAssignment)
   if (exportDefaultStatement) {
