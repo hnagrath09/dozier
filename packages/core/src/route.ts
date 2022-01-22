@@ -1,10 +1,12 @@
 import { capitalize, words } from 'lodash'
+import { FunctionParams } from './param'
 
 export type FunctionRoute = {
   type: 'function'
   title: string
   description?: string
   route: string
+  params: FunctionParams[]
 }
 
 export type ModuleRoute = {

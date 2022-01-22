@@ -29,7 +29,7 @@ function parseFunctionParams(functionDeclaration: ArrowFunction | FunctionDeclar
   return { params: functionParams }
 }
 
-export default function parse(fileContent: string) {
+export function parse(fileContent: string) {
   const sourceFile = createSourceFile('./function.ts', fileContent, ScriptTarget.ESNext)
   const { statements } = sourceFile
 
