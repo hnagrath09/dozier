@@ -1,8 +1,11 @@
+import { useRef } from 'react'
 import AceEditor from 'react-ace'
 import useMeasure from 'react-use-measure'
 
+import 'ace-builds/src-noconflict/ext-language_tools'
 import 'ace-builds/src-noconflict/mode-typescript'
 import 'ace-builds/src-noconflict/theme-monokai'
+import 'ace-builds/src-noconflict/snippets/typescript'
 
 type EditorProps = {
   value: string
@@ -10,15 +13,26 @@ type EditorProps = {
 }
 
 export default function Editor({ value, onChange }: EditorProps) {
+  const editorRef = useRef<AceEditor | null>(null)
   const [measure, containerbounds] = useMeasure()
 
   return (
     <div className="flex-1 h-full" ref={measure}>
       <AceEditor
+        focus
         value={value}
+        enableSnippets
+        ref={editorRef}
+        showGutter={true}
         theme="monokai"
         mode="typescript"
         onChange={onChange}
+        onLoad={(editor) => {
+          editor.renderer.setPadding(10)
+          editor.renderer.setScrollMargin(10, 10, 10, 10)
+        }}
+        enableLiveAutocompletion
+        enableBasicAutocompletion
         width={`${containerbounds?.width ?? 0}px`}
         height={`${containerbounds?.height ?? 0}px`}
         setOptions={{
