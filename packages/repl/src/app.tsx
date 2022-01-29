@@ -9,7 +9,7 @@ const input = `const sumNumbers = (firstNumber: number, secondNumber: number) =>
   return a + b;
 }
 
-export default foo;
+export default sumNumbers;
 `
 
 export default function App() {

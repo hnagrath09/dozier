@@ -4,8 +4,10 @@ import useMeasure from 'react-use-measure'
 
 import 'ace-builds/src-noconflict/ext-language_tools'
 import 'ace-builds/src-noconflict/mode-typescript'
-import 'ace-builds/src-noconflict/theme-monokai'
+import 'ace-builds/src-noconflict/theme-tomorrow'
+import 'ace-builds/src-noconflict/theme-tomorrow_night'
 import 'ace-builds/src-noconflict/snippets/typescript'
+import useThemeContext from '../../hooks/use-theme-context'
 
 type EditorProps = {
   value: string
@@ -15,6 +17,7 @@ type EditorProps = {
 export default function Editor({ value, onChange }: EditorProps) {
   const editorRef = useRef<AceEditor | null>(null)
   const [measure, containerbounds] = useMeasure()
+  const { theme } = useThemeContext()
 
   return (
     <div className="flex-1 h-full" ref={measure}>
@@ -23,9 +26,9 @@ export default function Editor({ value, onChange }: EditorProps) {
         value={value}
         enableSnippets
         ref={editorRef}
-        showGutter={true}
-        theme="monokai"
+        theme={theme === 'light' ? 'tomorrow' : 'tomorrow_night'}
         mode="typescript"
+        showGutter={true}
         onChange={onChange}
         onLoad={(editor) => {
           editor.renderer.setPadding(10)
@@ -38,6 +41,7 @@ export default function Editor({ value, onChange }: EditorProps) {
         setOptions={{
           fontSize: 14,
           showPrintMargin: false,
+          fontFamily: '"Fira Code", monospace',
         }}
       />
     </div>
