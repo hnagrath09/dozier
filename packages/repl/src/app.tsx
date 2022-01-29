@@ -1,15 +1,18 @@
 import { useState } from 'react'
+import SplitPane from 'react-split-pane'
 import { parse } from '@dozier/core'
 
 import Editor from 'components/editor'
 import Preview from 'components/preview'
 import Navbar from 'components/navbar'
 
-const input = `const sumNumbers = (firstNumber: number, secondNumber: number) => {
+const input = `export default function sumNumbers(
+  /** @dozierParam First number */ /** @minValue 0 */
+  a: number, 
+  /** @dozierParam Second number */ /** @minValue 0 */
+  b: number) {
   return a + b;
 }
-
-export default sumNumbers;
 `
 
 export default function App() {
@@ -32,9 +35,11 @@ export default function App() {
   return (
     <div className="flex flex-col items-center justify-center w-screen h-screen">
       <Navbar />
-      <div className="flex items-center justify-center flex-1 w-full">
-        <Editor value={value} onChange={handleChange} />
-        <Preview params={params} error={error} />
+      <div className="relative flex-1 w-full">
+        <SplitPane split="vertical" defaultSize="50%">
+          <Editor value={value} onChange={handleChange} />
+          <Preview params={params} error={error} />
+        </SplitPane>
       </div>
     </div>
   )

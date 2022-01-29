@@ -21,7 +21,7 @@ export default function Editor({ value, onChange }: EditorProps) {
   const { theme } = useThemeContext()
 
   return (
-    <div className="flex-1 h-full" ref={measure}>
+    <div className="h-full" ref={measure}>
       <AceEditor
         focus
         value={value}
