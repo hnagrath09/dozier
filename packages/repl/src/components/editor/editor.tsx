@@ -7,7 +7,8 @@ import 'ace-builds/src-noconflict/mode-typescript'
 import 'ace-builds/src-noconflict/theme-tomorrow'
 import 'ace-builds/src-noconflict/theme-tomorrow_night'
 import 'ace-builds/src-noconflict/snippets/typescript'
-import useThemeContext from '../../hooks/use-theme-context'
+
+import useThemeContext from 'hooks/use-theme-context'
 
 type EditorProps = {
   value: string

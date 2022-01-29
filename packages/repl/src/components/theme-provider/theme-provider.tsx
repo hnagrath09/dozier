@@ -1,5 +1,5 @@
 import { ReactNode, useLayoutEffect, useState } from 'react'
-import ThemeContext from '../../context/theme'
+import ThemeContext from 'context/theme'
 
 type ThemeProviderProps = {
   children: ReactNode

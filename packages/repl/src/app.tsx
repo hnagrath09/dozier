@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { parse } from '@dozier/core'
 
-import Editor from './components/editor'
-import Preview from './components/preview'
-import Navbar from './components/navbar'
+import Editor from 'components/editor'
+import Preview from 'components/preview'
+import Navbar from 'components/navbar'
 
 const input = `const sumNumbers = (firstNumber: number, secondNumber: number) => {
   return a + b;

@@ -1,7 +1,7 @@
 import { Button } from 'antd'
-import { ReactComponent as Logo } from '../../assets/favicon.svg'
-import { ReactComponent as Sun } from '../../assets/sun.svg'
-import useThemeContext from '../../hooks/use-theme-context'
+import { ReactComponent as Logo } from 'assets/favicon.svg'
+import { ReactComponent as Sun } from 'assets/sun.svg'
+import useThemeContext from 'hooks/use-theme-context'
 
 export default function Navbar() {
   const { setTheme } = useThemeContext()
