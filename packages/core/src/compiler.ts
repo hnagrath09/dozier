@@ -84,9 +84,12 @@ async function compileRoutes(rootDirPath: string, rootDirName?: string): Promise
   return routes
 }
 
-export async function compile(rootDir: string, outputDir: string): Promise<{ routes: Route[] }> {
+export async function compile(rootDir: string, outputDir: string) {
   const routes = await compileRoutes(rootDir)
-  await compileProgram(rootDir, outputDir, routes)
+  const program = await compileProgram(rootDir, outputDir, routes)
 
-  return { routes }
+  return {
+    routes,
+    program,
+  }
 }

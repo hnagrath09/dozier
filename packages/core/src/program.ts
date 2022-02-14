@@ -14,7 +14,7 @@ export async function compileProgram(rootDir: string, outputDir: string, routes:
     ${functionRoutes.map(({ route }) => `${getRouteVariable(route)}`).join(',\n')}
   }`
 
-  const buildResult = await esbuild.build({
+  return await esbuild.build({
     stdin: {
       contents: entryFile,
       resolveDir: rootDir,
@@ -24,9 +24,4 @@ export async function compileProgram(rootDir: string, outputDir: string, routes:
     outfile: path.resolve(outputDir, 'index.js'),
     bundle: true,
   })
-
-  return {
-    routes: functionRoutes,
-    buildResult,
-  }
 }

@@ -1,0 +1,23 @@
+{
+  "name": "@dozier/cli",
+  "version": "1.0.0",
+  "description": "cli to watch for changes in functions",
+  "main": "src/index.ts",
+  "author": "Himanshu Nagrath",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "ts-node src/cli.ts -f functions -o build"
+  },
+  "dependencies": {
+    "@dozier/core": "*",
+    "chalk": "^4.1.2",
+    "chalk-animation": "^1.6.0",
+    "chokidar": "^3.5.3",
+    "commander": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/chalk-animation": "^1.6.1",
+    "ts-node": "^10.4.0"
+  }
+}

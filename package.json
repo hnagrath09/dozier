@@ -10,8 +10,8 @@
     "packages/**"
   ],
   "scripts": {
+    "dev:cli": "yarn workspace @dozier/cli dev",
     "start:repl": "yarn workspace @dozier/repl dev",
-    "execute": "ts-node packages/core/src/parser.ts",
     "test": "jest --watch --verbose",
     "test:ci": "jest --verbose"
   },
@@ -30,7 +30,6 @@
     "eslint-plugin-promise": "^5.2.0",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
-    "jest": "^27.4.7",
-    "ts-node": "^10.4.0"
+    "jest": "^27.4.7"
   }
 }
